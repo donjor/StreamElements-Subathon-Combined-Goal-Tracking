@@ -1,4 +1,4 @@
-# StreamElements Astro Websocket Gateway Example
+# StreamElements Subathon Combined Goal Tracking
 
 Built from StreamElements Astro Websocket Gateway Example:
 https://github.com/donjor/StreamElements-Websocket-Example
