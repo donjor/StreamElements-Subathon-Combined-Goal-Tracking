@@ -6,7 +6,9 @@ const path = require('path');
 // Read from .env file
 require('dotenv').config();
 const JWT_TOKEN = process.env.JWT_TOKEN; // Ensure you have a JWT_TOKEN in your .env file
-const ALWAYS_READ_IN_POINTS_TXT = process.env.ALWAYS_READ_IN_POINTS_TXT === 'true'; // Read points from points.txt if set to true
+const ALWAYS_READ_IN_POINTS_TXT = process.env.ALWAYS_READ_IN_POINTS_TXT !== 'false'; // Default to true if not set or set to 'false'
+
+console.log('INIT: ALWAYS_READ_IN_POINTS_TXT =', ALWAYS_READ_IN_POINTS_TXT); // Log the JWT token for debugging
 
 // DEFAULT POINTS_PER_FOLLOW = 10
 const POINTS_PER_FOLLOW = process.env.POINTS_PER_FOLLOW ? parseInt(process.env.POINTS_PER_FOLLOW, 10) : 10;
@@ -25,6 +27,16 @@ const POINTS_PER_ONE_USD_DONO = process.env.POINTS_PER_ONE_USD_DONO ? parseInt(p
 
 // DEFAULT POINTS_PER_ONE_HUNDRED_BITS = 30
 const POINTS_PER_ONE_HUNDRED_BITS = process.env.POINTS_PER_ONE_HUNDRED_BITS ? parseInt(process.env.POINTS_PER_ONE_HUNDRED_BITS, 10) : 30;
+
+
+console.log('INIT: Points Configuration:');
+console.log('Points per Follow:', POINTS_PER_FOLLOW);
+console.log('Points per Tier 1 Sub:', POINTS_PER_TIER_ONE_SUB);
+console.log('Points per Tier 2 Sub:', POINTS_PER_TIER_TWO_SUB);
+console.log('Points per Tier 3 Sub:', POINTS_PER_TIER_THREE_SUB);
+console.log('Points per $1 Donation:', POINTS_PER_ONE_USD_DONO);
+console.log('Points per 100 Bits Donation:', POINTS_PER_ONE_HUNDRED_BITS);
+
 
 // const goals = {
 //   "1": {
@@ -62,17 +74,24 @@ function readPoints() {
     return 0;
   }
 }
-
-
+// Initialize current points
 let currentPoints = readPoints(); // Initialize current points from the file
 console.log('INIT: Current points:', currentPoints); // Log the current points
 
 // Function to update the points in points.txt
-function updatePoints(points) {
+function updatePoints(points_to_add) {
   try {
-    console.log('Points Updated | Current Points:', points); // Log the new points value
+
+    if (ALWAYS_READ_IN_POINTS_TXT) {
+      currentPoints = readPoints(); // Read points from the file if ALWAYS_READ_IN_POINTS_TXT is true
+    }
+    console.log(`Updating points... Existing Points: ${currentPoints}`); // Log the current points before updating
+    
+    currentPoints += points_to_add; // Use the provided points_to_add value
+
+    console.log(`Points Updated (+${points_to_add}) | Updated Current Points: ${currentPoints}`); // Log the new points value
     // Write the new points value to the file
-    fs.writeFileSync(pointsFilePath, points.toString());
+    fs.writeFileSync(pointsFilePath, currentPoints.toString());
   } catch (error) {
     console.error('Error writing to points file:', error);
   }
@@ -115,8 +134,7 @@ ws.on('message', (data) => {
             case 'follow':
               // Handle follow event
               console.log('New follower:', activity.data.username);
-              currentPoints += POINTS_PER_FOLLOW; // Add points for a new follower
-              updatePoints(currentPoints); // Update points in the file
+              updatePoints(POINTS_PER_FOLLOW); // Add points for a new follower
               break;
             case 'subscriber':
               // Handle subscription event
@@ -124,27 +142,25 @@ ws.on('message', (data) => {
               let teir = activity.data.tier;
               let amount = activity.data.amount;
                 if (teir == 1000) {
-                    currentPoints += POINTS_PER_TIER_ONE_SUB * amount; // Add points for each tier 1 subscriptions
+                    updatePoints(POINTS_PER_TIER_ONE_SUB * amount); // Add points for each tier 1 subscriptions
                 } else if (teir == 2000) {
-                    currentPoints += POINTS_PER_TIER_TWO_SUB * amount; // Add points for each tier 2 subscriptions
+                    updatePoints(POINTS_PER_TIER_TWO_SUB * amount); // Add points for each tier 2 subscriptions
                 } else if (teir == 3000) {
-                    currentPoints += POINTS_PER_TIER_THREE_SUB * amount; // Add points for each tier 3 subscriptions
+                    updatePoints(POINTS_PER_TIER_THREE_SUB * amount); // Add points for each tier 3 subscriptions
                 } else {
-                    currentPoints += POINTS_PER_TIER_ONE_SUB * amount; // Default to tier 1 if tier is not recognized
+                    updatePoints(POINTS_PER_TIER_ONE_SUB * amount); // Default to tier 1 if tier is not recognized
                 }
-              updatePoints(currentPoints); // Update points in the file
+
               break;
             case 'tip':
               // Handle tip (donation) event
               console.log('New donation (tip):', activity.data.username, 'Amount:', activity.data.amount);
-              currentPoints += activity.data.amount * POINTS_PER_ONE_USD_DONO; // Add points based on the donation amount
-              updatePoints(currentPoints); // Update points in the file
+              updatePoints(activity.data.amount * POINTS_PER_ONE_USD_DONO); // Add points based on the donation amount per USD
               break;
             case 'cheer':
               // Handle bits donation event
               console.log('Bits donation:', activity.data.username, 'Amount:', activity.data.amount);
-              currentPoints += Math.floor(activity.data.amount / 100) * POINTS_PER_ONE_HUNDRED_BITS; // Add 30 points for every 100 bits
-              updatePoints(currentPoints); // Update points in the file
+              updatePoints(Math.floor(activity.data.amount / 100) * POINTS_PER_ONE_HUNDRED_BITS); // Add x points for every 100 bits
               break;
             default:
               console.log('Other activity:', activity.type);
