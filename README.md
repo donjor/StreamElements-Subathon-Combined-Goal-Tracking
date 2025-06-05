@@ -5,6 +5,8 @@ https://github.com/donjor/StreamElements-Websocket-Example
 
 This project is an example Node.js application that connects to the StreamElements Astro Websocket Gateway to listen for channel activity events such as follows, subscriptions, tips, and cheers and tallys the points associcated from each action and updates a point.txt file
 
+Stream Elements docs
+https://docs.streamelements.com/websockets
 
 ## Features
 
@@ -50,6 +52,7 @@ Use cmd or powershell on Windows:
     
     Click the Copy Button under the JWT token
 
+    Optionally Update the `POINTS_PER_...` variables 
 
 
 ## Usage

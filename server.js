@@ -6,6 +6,25 @@ const path = require('path');
 // Read from .env file
 require('dotenv').config();
 const JWT_TOKEN = process.env.JWT_TOKEN; // Ensure you have a JWT_TOKEN in your .env file
+const ALWAYS_READ_IN_POINTS_TXT = process.env.ALWAYS_READ_IN_POINTS_TXT === 'true'; // Read points from points.txt if set to true
+
+// DEFAULT POINTS_PER_FOLLOW = 10
+const POINTS_PER_FOLLOW = process.env.POINTS_PER_FOLLOW ? parseInt(process.env.POINTS_PER_FOLLOW, 10) : 10;
+
+// DEFAULT POINTS_PER_TIER_ONE_SUB = 150
+const POINTS_PER_TIER_ONE_SUB = process.env.POINTS_PER_TIER_ONE_SUB ? parseInt(process.env.POINTS_PER_TIER_ONE_SUB, 10) : 150;
+
+// DEFAULT POINTS_PER_TIER_TWO_SUB = 300 
+const POINTS_PER_TIER_TWO_SUB = process.env.POINTS_PER_TIER_TWO_SUB ? parseInt(process.env.POINTS_PER_TIER_TWO_SUB, 10) : 300;
+
+// DEFAULT POINTS_PER_TIER_THREE_SUB = 750
+const POINTS_PER_TIER_THREE_SUB = process.env.POINTS_PER_TIER_THREE_SUB ? parseInt(process.env.POINTS_PER_TIER_THREE_SUB, 10) : 750;
+
+// DEFAULT POINTS_PER_ONE_USD_DONO = 60
+const POINTS_PER_ONE_USD_DONO = process.env.POINTS_PER_ONE_USD_DONO ? parseInt(process.env.POINTS_PER_ONE_USD_DONO, 10) : 60;
+
+// DEFAULT POINTS_PER_ONE_HUNDRED_BITS = 30
+const POINTS_PER_ONE_HUNDRED_BITS = process.env.POINTS_PER_ONE_HUNDRED_BITS ? parseInt(process.env.POINTS_PER_ONE_HUNDRED_BITS, 10) : 30;
 
 // const goals = {
 //   "1": {
@@ -52,9 +71,6 @@ console.log('INIT: Current points:', currentPoints); // Log the current points
 function updatePoints(points) {
   try {
     console.log('Points Updated | Current Points:', points); // Log the new points value
-
-
-
     // Write the new points value to the file
     fs.writeFileSync(pointsFilePath, points.toString());
   } catch (error) {
@@ -99,7 +115,7 @@ ws.on('message', (data) => {
             case 'follow':
               // Handle follow event
               console.log('New follower:', activity.data.username);
-              currentPoints += 10;
+              currentPoints += POINTS_PER_FOLLOW; // Add points for a new follower
               updatePoints(currentPoints); // Update points in the file
               break;
             case 'subscriber':
@@ -108,26 +124,26 @@ ws.on('message', (data) => {
               let teir = activity.data.tier;
               let amount = activity.data.amount;
                 if (teir == 1000) {
-                    currentPoints += 150 * amount; // Add 150 points for subscriptions
+                    currentPoints += POINTS_PER_TIER_ONE_SUB * amount; // Add points for each tier 1 subscriptions
                 } else if (teir == 2000) {
-                    currentPoints += 150 * 2 * amount; // Add 300 points for subscriptions
+                    currentPoints += POINTS_PER_TIER_TWO_SUB * amount; // Add points for each tier 2 subscriptions
                 } else if (teir == 3000) {
-                    currentPoints += 150 * 5 * amount; // Add 500 points for subscriptions
+                    currentPoints += POINTS_PER_TIER_THREE_SUB * amount; // Add points for each tier 3 subscriptions
                 } else {
-                    currentPoints += 150 * amount; // Add 100 points for subscriptions
+                    currentPoints += POINTS_PER_TIER_ONE_SUB * amount; // Default to tier 1 if tier is not recognized
                 }
               updatePoints(currentPoints); // Update points in the file
               break;
             case 'tip':
               // Handle tip (donation) event
               console.log('New donation (tip):', activity.data.username, 'Amount:', activity.data.amount);
-              currentPoints += activity.data.amount * 60; // Add 60 points per $1 tip
+              currentPoints += activity.data.amount * POINTS_PER_ONE_USD_DONO; // Add points based on the donation amount
               updatePoints(currentPoints); // Update points in the file
               break;
             case 'cheer':
               // Handle bits donation event
               console.log('Bits donation:', activity.data.username, 'Amount:', activity.data.amount);
-              currentPoints += Math.floor(activity.data.amount / 100) * 30; // Add 30 points for every 100 bits
+              currentPoints += Math.floor(activity.data.amount / 100) * POINTS_PER_ONE_HUNDRED_BITS; // Add 30 points for every 100 bits
               updatePoints(currentPoints); // Update points in the file
               break;
             default:
