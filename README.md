@@ -1,5 +1,7 @@
 # StreamElements Subathon Combined Goal Tracking
 
+[Download Windows build from Releases](https://github.com/donjor/StreamElements-Subathon-Combined-Goal-Tracking/releases)
+
 Built from StreamElements Astro Websocket Gateway Example:
 https://github.com/donjor/StreamElements-Websocket-Example
 
@@ -82,6 +84,7 @@ Packaging uses [`pkg`](https://github.com/vercel/pkg) to bundle the server with 
 ### Shipping the build to a Windows user
 
 Distribute the generated `releases/streamelements-goal-tracker-win-<version>.zip`. It already contains:
+
 - `streamelements-goal-tracker.exe`
 - `.env.example` (have the user rename/fill in `.env`)
 - `points.txt` and `earnings.txt` initialised to `0.00`
@@ -100,3 +103,5 @@ gh release create "v$VERSION" "releases/streamelements-goal-tracker-win-$VERSION
 ```
 
 Adjust `--notes` to match your release notes. GitHub will attach the ZIP to the new release automatically.
+
+Releases: https://github.com/donjor/StreamElements-Subathon-Combined-Goal-Tracking/releases
