@@ -76,7 +76,7 @@ const earningsFilePath = path.join(__dirname, "earnings.txt");
 
 const writeFormattedValue = (filePath, value, options = {}) => {
   const formatted = formatNumber(value);
-  const payload = options.appendSymbol ? `${formatted}${options.appendSymbol}` : formatted;
+  const payload = options.prefixSymbol ? `${options.prefixSymbol}${formatted}` : formatted;
   fs.writeFileSync(filePath, payload);
 };
 
@@ -102,7 +102,7 @@ function readPoints() {
 }
 
 function readEarnings() {
-  return readStoredValue(earningsFilePath, { appendSymbol: CURRENCY_SYMBOL });
+  return readStoredValue(earningsFilePath, { prefixSymbol: CURRENCY_SYMBOL });
 }
 
 let currentPoints = USE_POINTS ? readPoints() : 0;
@@ -110,13 +110,15 @@ console.log("INIT: Current points:", formatNumber(currentPoints));
 
 let currentEarnings = USE_CURRENCY ? readEarnings() : 0;
 if (USE_CURRENCY) {
-  console.log("INIT: Current earnings:", `${formatNumber(currentEarnings)}${CURRENCY_SYMBOL}`);
+  console.log("INIT: Current earnings:", `${CURRENCY_SYMBOL}${formatNumber(currentEarnings)}`);
 }
 
-const buildDeltaLabel = (delta) => {
+const buildDeltaLabel = (delta, options = {}) => {
   const absValue = Math.abs(delta);
   const sign = delta >= 0 ? "+" : "-";
-  return `${sign}${formatNumber(absValue)}`;
+  const formatted = formatNumber(absValue);
+  const payload = options.prefixSymbol ? `${options.prefixSymbol}${formatted}` : formatted;
+  return `${sign}${payload}`;
 };
 
 function updatePoints(pointsToAdd) {
@@ -159,13 +161,15 @@ function updateEarnings(amountToAdd) {
     if (ALWAYS_READ_IN_POINTS_TXT) {
       currentEarnings = readEarnings();
     }
-    console.log("Updating earnings… Existing Earnings:", formatNumber(currentEarnings));
+    console.log("Updating earnings… Existing Earnings:", `${CURRENCY_SYMBOL}${formatNumber(currentEarnings)}`);
     currentEarnings += delta;
     console.log(
-      "Earnings Updated (" + buildDeltaLabel(delta) + ") | Updated Current Earnings:",
-      `${formatNumber(currentEarnings)}${CURRENCY_SYMBOL}`
+      "Earnings Updated (" +
+        buildDeltaLabel(delta, { prefixSymbol: CURRENCY_SYMBOL }) +
+        ") | Updated Current Earnings:",
+      `${CURRENCY_SYMBOL}${formatNumber(currentEarnings)}`
     );
-    writeFormattedValue(earningsFilePath, currentEarnings, { appendSymbol: CURRENCY_SYMBOL });
+    writeFormattedValue(earningsFilePath, currentEarnings, { prefixSymbol: CURRENCY_SYMBOL });
   } catch (err) {
     console.error("Error writing to earnings file:", err);
   }

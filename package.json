@@ -1,9 +1,11 @@
 {
-  "name": "twitch-listener",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "streamelements-goal-tracker",
+  "version": "2.0.0",
+  "main": "server.js",
+  "bin": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:win": "rm -rf dist && pkg . && mkdir -p dist releases && cp README.md dist/README.md && cp .env.example dist/.env.example && cp points.txt dist/points.txt && cp earnings.txt dist/earnings.txt && VERSION=$(node -p \"require('./package.json').version\") && rm -f releases/streamelements-goal-tracker-win-$VERSION.zip && (cd dist && npx bestzip \"../releases/streamelements-goal-tracker-win-$VERSION.zip\" .)"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +18,15 @@
     "i": "^0.3.7",
     "uuid": "^11.1.0",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "bestzip": "^2.2.1",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "dist"
   }
 }

@@ -1,3 +1,6 @@
 .env
 node_modules
-points.txt
+*.txt
+/dist
+/releases
+/releases

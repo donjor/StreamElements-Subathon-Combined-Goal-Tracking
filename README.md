@@ -63,3 +63,40 @@ Use cmd or powershell on Windows:
    ```bash
    node server.js
    ```
+
+## Build a Windows Executable (no Node.js required for end user)
+
+Packaging uses [`pkg`](https://github.com/vercel/pkg) to bundle the server with a Node runtime.
+
+1. Install dependencies (one-time on the build machine):
+   ```bash
+   npm install
+   ```
+2. Build the Windows binary:
+   ```bash
+   npm run build:win
+   ```
+   - The compiled executable is written to `dist/streamelements-goal-tracker.exe`.
+   - A redistributable ZIP named `streamelements-goal-tracker-win-<version>.zip` is produced in `releases/`.
+
+### Shipping the build to a Windows user
+
+Distribute the generated `releases/streamelements-goal-tracker-win-<version>.zip`. It already contains:
+- `streamelements-goal-tracker.exe`
+- `.env.example` (have the user rename/fill in `.env`)
+- `points.txt` and `earnings.txt` initialised to `0.00`
+- `README.md` with usage details
+
+Usage for the recipient: unzip everything into one folder, copy `.env.example` to `.env` and configure it, then double-click `streamelements-goal-tracker.exe` (or run it from PowerShell). The console window will stay open showing connection status and updates.
+
+### Publishing the ZIP to GitHub Releases
+
+With the [GitHub CLI](https://cli.github.com/) installed and authenticated:
+
+```bash
+gh auth login                               # if not already logged in
+VERSION=$(node -p "require('./package.json').version")
+gh release create "v$VERSION" "releases/streamelements-goal-tracker-win-$VERSION.zip" --notes "Windows build for v$VERSION"
+```
+
+Adjust `--notes` to match your release notes. GitHub will attach the ZIP to the new release automatically.
