@@ -5,6 +5,35 @@
 Built from StreamElements Astro Websocket Gateway Example:
 https://github.com/donjor/StreamElements-Websocket-Example
 
+## Quick Start for Windows Users
+
+1. Unzip
+2. Copy `.env.example` rename to `.env`
+3. Open `.env` with notepad, Add in [JWT token from StreamElements](https://streamelements.com/dashboard/account/channels)
+   ```env
+   JWT_TOKEN="your_jwt_token_here"
+   ```
+4. Edit other `.env` variables as needed
+
+   ```env
+   # Points system configuration
+   USE_POINTS="true" # Set to "true" to enable points system, "false" to disable
+   POINTS_PER_FOLLOW=10
+   POINTS_PER_TIER_ONE_SUB=150
+   ...
+
+   USE_CURRENCY="false" # Set to "true" to enable currency-based points system, 0 to disable
+   CURRENCY_SYMBOL="$" # Symbol for the currency, e.g., "$" for USD
+   EARNINGS_PER_TIER_ONE_SUB=4.99
+   EARNINGS_PER_ONE_USD_DONO=1.00 # Conversion rate per USD donated (if using a different currency)
+   ...
+   ```
+
+5. Run: Double-click `streamelements-goal-tracker.exe`. The console window will stay open showing connection status and updates.
+6. Add `points.txt` and/or `earnings.txt` as a text source in OBS to display your goal!
+
+## Overview
+
 This project is an example Node.js application that connects to the StreamElements Astro Websocket Gateway to listen for channel activity events such as follows, subscriptions, tips, and cheers and tallys the points (or earnings) associcated from each action and updates a point.txt file (and/or earnings.txt file) that can be used in an OBS text source to display a combined goal for your stream.
 
 Stream Elements docs
@@ -90,8 +119,6 @@ Distribute the generated `releases/streamelements-goal-tracker-win-<version>.zip
 - `points.txt` and `earnings.txt` initialised to `0.00`
 - `README.md` with usage details
 
-Usage for the recipient: unzip everything into one folder, copy `.env.example` to `.env` and configure it, then double-click `streamelements-goal-tracker.exe` (or run it from PowerShell). The console window will stay open showing connection status and updates.
-
 ### Publishing the ZIP to GitHub Releases
 
 With the [GitHub CLI](https://cli.github.com/) installed and authenticated:
@@ -103,5 +130,3 @@ gh release create "v$VERSION" "releases/streamelements-goal-tracker-win-$VERSION
 ```
 
 Adjust `--notes` to match your release notes. GitHub will attach the ZIP to the new release automatically.
-
-Releases: https://github.com/donjor/StreamElements-Subathon-Combined-Goal-Tracking/releases

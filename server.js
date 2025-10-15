@@ -9,10 +9,12 @@ const ALWAYS_READ_IN_POINTS_TXT = process.env.ALWAYS_READ_IN_POINTS_TXT !== "fal
 const USE_POINTS = process.env.USE_POINTS !== "false";
 const USE_CURRENCY = process.env.USE_CURRENCY === "true";
 const CURRENCY_SYMBOL = process.env.CURRENCY_SYMBOL || "$";
+const RUNTIME_DIR = process.pkg ? path.dirname(process.execPath) : __dirname;
 
 console.log("INIT: ALWAYS_READ_IN_POINTS_TXT =", ALWAYS_READ_IN_POINTS_TXT);
 console.log("INIT: USE_POINTS =", USE_POINTS);
 console.log("INIT: USE_CURRENCY =", USE_CURRENCY, "| CURRENCY_SYMBOL =", CURRENCY_SYMBOL);
+console.log("INIT: RUNTIME_DIR =", RUNTIME_DIR);
 
 const getEnvNumber = (key, fallback) => {
   const raw = process.env[key];
@@ -71,8 +73,8 @@ if (USE_CURRENCY) {
 }
 
 // ─── points.txt setup ───────────────────────────────────────────────────────────
-const pointsFilePath = path.join(__dirname, "points.txt");
-const earningsFilePath = path.join(__dirname, "earnings.txt");
+const pointsFilePath = path.join(RUNTIME_DIR, "points.txt");
+const earningsFilePath = path.join(RUNTIME_DIR, "earnings.txt");
 
 const writeFormattedValue = (filePath, value, options = {}) => {
   const formatted = formatNumber(value);
